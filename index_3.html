@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#102b3b">
+<title>Aeroporto Internacional da Colômbia — Espanhol B1 em VR</title>
+<style>
+:root{--navy:#102b3b;--blue:#176b87;--cyan:#8ed8df;--gold:#f0bd68;--paper:#f4f7f8;--ink:#17303d;--muted:#58717c}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,system-ui,Segoe UI,sans-serif;background:#102b3b;color:white}
+#scene{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
+#topbar{position:fixed;z-index:5;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none}
+.brand,.status{background:rgba(9,30,42,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:10px 14px;pointer-events:auto}
+.brand strong{display:block;font-size:14px;letter-spacing:.04em}.brand span,.status{font-size:12px;color:#d5e8ed}
+#missionPill{font-weight:700;color:#f5ce8d}
+#panel{position:fixed;z-index:6;left:18px;top:88px;width:min(370px,calc(100vw - 36px));max-height:calc(100vh - 112px);overflow:auto;background:rgba(246,249,250,.96);color:var(--ink);border-radius:18px;padding:18px;box-shadow:0 18px 60px #00172277;backdrop-filter:blur(12px)}
+#panel h1{font-size:20px;margin:0 0 6px;color:var(--navy)}#panel h2{font-size:15px;margin:14px 0 6px;color:var(--blue)}
+#panel p{font-size:13px;line-height:1.5;margin:7px 0;color:#294653}#panel .small{font-size:11px;color:var(--muted)}
+#panel button,.action{border:0;border-radius:11px;padding:11px 13px;background:var(--blue);color:white;font-weight:700;font-size:13px;cursor:pointer;margin:5px 5px 0 0;min-height:42px}
+#panel button.secondary{background:#dce9ed;color:var(--navy)}#panel button.gold{background:#b77728;color:white}
+#panel button:focus-visible{outline:3px solid #f0bd68;outline-offset:2px}
+#panel .choices{display:grid;gap:7px;margin-top:9px}#panel .choices button{text-align:left;margin:0;background:#e7eff2;color:#17303d;border:1px solid #cbdce1}
+#panel .choices button:hover{background:#d5e8ec}#panel .choices button.correct{background:#d8f1e5;border-color:#56a77b}#panel .choices button.wrong{background:#fae3df;border-color:#d57b70}
+#panel input{width:100%;padding:11px;border:1px solid #b7cbd2;border-radius:9px;font-size:14px;margin:4px 0 8px}
+#panel .progress{height:6px;border-radius:6px;background:#d9e4e8;overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:#d59b4d;width:0;transition:width .3s}
+#panel .tag{display:inline-block;background:#e1eef1;color:#17627a;border-radius:99px;padding:4px 8px;font-size:10px;font-weight:800;letter-spacing:.06em}
+#panel .feedback{padding:10px;border-radius:10px;background:#eaf2f4;margin-top:9px;font-size:12px;line-height:1.45}
+#controls{position:fixed;z-index:5;right:18px;bottom:18px;max-width:min(340px,45vw);background:rgba(9,30,42,.8);border:1px solid #ffffff33;border-radius:14px;padding:11px 13px;font-size:11px;line-height:1.5;color:#e0edf0}
+#controls b{color:#f3c77e}#touchNav{display:none;position:fixed;z-index:7;right:14px;bottom:18px;gap:5px;flex-direction:column;align-items:center}#touchNav div{display:flex;gap:5px}#touchNav button{width:48px;height:48px;border:1px solid #ffffff66;border-radius:12px;background:#102b3bd9;color:#fff;font-size:20px;touch-action:none}#debug{display:none;position:fixed;z-index:10;right:12px;top:78px;background:#000c;color:#8df0a8;padding:8px 10px;font:12px monospace;border-radius:8px}
+#toast{position:fixed;z-index:9;left:50%;bottom:24px;transform:translateX(-50%);background:#102b3bee;color:white;padding:11px 16px;border-radius:12px;font-size:13px;max-width:90vw;text-align:center;opacity:0;transition:opacity .2s;pointer-events:none}
+#startCover{position:fixed;z-index:20;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,#0c2737ee,#164c61dd);padding:20px}
+#startCard{width:min(640px,100%);background:#f4f7f8;color:#17303d;border-radius:22px;padding:clamp(20px,4vw,34px);box-shadow:0 24px 80px #0007}
+#startCard h1{font-size:clamp(24px,4vw,36px);line-height:1.1;margin:10px 0;color:#102b3b}
+#startCard p{line-height:1.55;font-size:14px;color:#3d5965}
+#startCard .eyebrow{color:#176b87;font-size:11px;font-weight:900;letter-spacing:.12em}
+#startCard button{background:#176b87;color:white;border:0;border-radius:12px;padding:13px 17px;font-weight:800;font-size:14px;cursor:pointer;margin:7px 7px 0 0}
+#startCard button.alt{background:#e0ebee;color:#17303d}
+#settings{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0;font-size:12px}
+#settings label{display:flex;gap:6px;align-items:center}
+#settings input{accent-color:#176b87}
+#xrHint{font-size:11px!important;background:#e8f0f2;padding:10px;border-radius:9px}
+#VRButton{z-index:30!important;bottom:18px!important;left:auto!important;right:18px!important;width:auto!important;padding:12px 16px!important;border-radius:12px!important;background:#176b87!important;border:1px solid #ffffff44!important;font-weight:800!important}
+@media(max-width:700px){#touchNav{display:flex;bottom:48vh}#panel{top:auto;bottom:12px;left:10px;width:calc(100vw - 20px);max-height:44vh;padding:13px}#controls{top:70px;right:10px;bottom:auto;max-width:46vw;font-size:10px}.brand{padding:8px 10px}.status{padding:8px;font-size:10px}}
+body.high-contrast #panel{background:#fff;color:#000;border:3px solid #000}body.high-contrast #panel p{color:#111}
+body.vr #panel,body.vr #controls{display:none}body.vr #topbar{display:none}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="topbar"><div class="brand"><strong>AEROPUERTO INTERNACIONAL</strong><span>Treinamento imersivo · Español B1</span></div><div class="status"><span id="missionPill">MISSÃO 1 · CHECK-IN</span><br><span id="progressText">Etapa 1 de 3</span></div></div>
+<section id="panel" aria-live="polite"></section>
+<div id="touchNav" aria-label="Controles de movimento"><button data-move="forward">▲</button><div><button data-move="left">◀</button><button data-move="back">▼</button><button data-move="right">▶</button></div></div><div id="controls"><b>CONTROLES</b><br>WASD: caminhar · Mouse: olhar<br>Toque/arraste: olhar e mover<br>VR: gatilho seleciona · grip agarra<br>Thumbstick: teleporte e giro em etapas</div>
+<div id="debug"></div><div id="toast"></div>
+<div id="startCover"><div id="startCard">
+<div class="eyebrow">EXPERIÊNCIA DE APRENDIZAGEM · ESPANHOL B1</div>
+<h1>Uma viagem começa no aeroporto.</h1>
+<p>Você vai embarcar em Bogotá. Complete o check-in, resolva uma ocorrência com a bagagem e passe pela imigração. Escute em espanhol, observe o espaço, faça perguntas e tome decisões.</p>
+<p><b>Tempo sugerido:</b> 40 minutos de exploração em VR, dentro de uma aula de 1 hora. As etapas pré-VR e pós-VR continuam sendo realizadas em sala.</p>
+<div id="settings">
+<label><input type="checkbox" id="seated"> Modo sentado</label>
+<label><input type="checkbox" id="contrast"> Alto contraste</label>
+<label><input type="checkbox" id="captions" checked> Legendas</label>
+<label><input type="checkbox" id="voice"> Narração pt-BR</label>
+</div>
+<p id="xrHint">O modo VR aparece quando o navegador e o dispositivo oferecem suporte a WebXR. Se não estiver disponível, a experiência inicia em 3D convencional.</p>
+<button id="begin">Entrar no aeroporto</button><button class="alt" id="creditsStart">Créditos e fontes</button>
+</div></div>
+<script type="module">
+import * as THREE from 'three';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const $=s=>document.querySelector(s), canvas=$('#scene');
+const state={mission:0,step:0,checkin:false,bag:false,immigration:false,quiz:0,score:0,quizDone:false,caption:true,voice:false,seated:false,high:false,activePanel:'main'};
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.autoUpdate=true;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.xr.enabled=true;
+renderer.xr.setReferenceSpaceType('local-floor');
+if(renderer.xr.setFoveation) renderer.xr.setFoveation(0.7);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xb5c7cb);scene.fog=new THREE.FogExp2(0xb5c7cb,.009);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.08,100);camera.position.set(0,1.65,5);
+const rig=new THREE.Group();rig.add(camera);scene.add(rig);
+const hemi=new THREE.HemisphereLight(0xd9f1ff,0x62594f,1.45);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffedda,2.25);sun.position.set(-7,12,7);sun.castShadow=true;sun.shadow.mapSize.set(1536,1536);sun.shadow.camera.left=-18;sun.shadow.camera.right=18;sun.shadow.camera.top=18;sun.shadow.camera.bottom=-18;sun.shadow.bias=-0.00018;sun.shadow.normalBias=.025;scene.add(sun);
+const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(new RoomEnvironment(),.04).texture;
+const mats={};
+function noiseTexture(base='#b9c4c7',accent='#e4e8e8',seed=1){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.fillStyle=base;x.fillRect(0,0,256,256);let n=seed;for(let i=0;i<15000;i++){n=(n*1664525+1013904223)>>>0;const a=(n%100)/500; x.fillStyle=`rgba(${n%255},${(n>>>8)%255},${(n>>>16)%255},${a})`;x.fillRect((n>>>4)%256,(n>>>12)%256,1+(n%3),1+(n%3));}for(let i=0;i<30;i++){x.strokeStyle=accent+'22';x.lineWidth=1;x.beginPath();let yy=(i*17+seed*9)%256;x.moveTo(0,yy);x.bezierCurveTo(80,yy-8,160,yy+8,256,yy-3);x.stroke();}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;return t;}
+const texFloor=noiseTexture('#7d8585','#b5b9b5',3),texWall=noiseTexture('#d4d9d7','#ffffff',8),texWood=noiseTexture('#72513d','#b88960',4),texMetal=noiseTexture('#8b9ca3','#d5e1e4',6);
+function mat(color,rough=.7,metal=0,texture=null){return new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,map:texture||null});}
+mats.floor=mat(0xffffff,.92,0,texFloor);mats.wall=mat(0xffffff,.88,0,texWall);mats.wood=mat(0xffffff,.7,0,texWood);mats.metal=mat(0xffffff,.32,.72,texMetal);mats.blue=mat(0x164d68,.4,.15);mats.glass=new THREE.MeshPhysicalMaterial({color:0xb9e5ed,roughness:.12,metalness:.05,transparent:true,opacity:.28,transmission:.2});mats.gold=mat(0xc28a43,.38,.55);mats.black=mat(0x17252b,.5,.2);mats.white=mat(0xf0f2ed,.55);mats.green=mat(0x36856c,.5);
+const interactives=[];const npcs=[];const raycaster=new THREE.Raycaster();const pointer=new THREE.Vector2();let selected=null,dragged=null,dragOffset=new THREE.Vector3(),look={active:false,x:0,y:0,yaw:0,pitch:0},lastTime=0,fps=0,frames=0,fpsTime=0;
+function mesh(geo,material,pos,opts={}){const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.castShadow=opts.cast!==false;m.receiveShadow=opts.receive!==false;if(opts.rot)m.rotation.set(...opts.rot);scene.add(m);return m;}
+function box(w,h,d,material,pos,bevel=.045){const r=Math.max(.002,Math.min(bevel, w*.22, h*.22, d*.22));const g=new RoundedBoxGeometry(w,h,d,3,r);return mesh(g,material,pos);}
+function label(text,pos,scale=1,color='#ffffff',bg='#12384b'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle=bg;x.beginPath();x.roundRect(8,8,496,112,18);x.fill();x.fillStyle=color;x.font='bold 42px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,64,470);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.Mesh(new THREE.PlaneGeometry(2.4*scale,.6*scale),new THREE.MeshBasicMaterial({map:t,transparent:true,side:THREE.DoubleSide}));m.position.set(...pos);scene.add(m);return m;}
+function addLightStrip(x,y,z,w){const o=box(w,.035,.12,mat(0xfff2d0,.25),[x,y,z],0);const l=new THREE.PointLight(0xffe7c2,1.5,5);l.position.set(x,y-.12,z);scene.add(l);}
+function floorArea(x,z,w,d){box(w,.18,d,mats.floor,[x,-.12,z],.02);for(let i=0;i<Math.floor(w/2);i++)box(.015,.006,d-.2,mat(0xc3c9c7,.9),[x-w/2+1+i*2,-.025,z],0);}
+function wall(x,y,z,w,h,d,material=mats.wall){return box(w,h,d,material,[x,y,z],.02);}
+function createNPC(x,z,role,shirt,skin=0xc58f70){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const skinMat=mat(skin,.68), shirtMat=mat(shirt,.76), dark=mat(0x20272a,.72), hairMat=mat(0x30251f,.92), pantsMat=mat(0x263744,.82), shoeMat=mat(0x202a30,.48), white=mat(0xf5f1e9,.48), accent=mat(0xd7e2e4,.5,.12);
+ const add=(geo,m,pos,rot)=>{const o=new THREE.Mesh(geo,m);o.position.set(...pos);if(rot)o.rotation.set(...rot);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;};
+ // Anatomical torso: tapered waist, chest and shoulders instead of a single capsule
+ const torsoPts=[new THREE.Vector2(.17,.77),new THREE.Vector2(.205,.84),new THREE.Vector2(.22,1.04),new THREE.Vector2(.255,1.28),new THREE.Vector2(.285,1.43),new THREE.Vector2(.22,1.51),new THREE.Vector2(.105,1.53)];
+ add(new THREE.LatheGeometry(torsoPts,24),shirtMat,[0,0,0]);
+ // Neck and softly shaped head with a distinct jaw
+ add(new THREE.CylinderGeometry(.075,.09,.14,18),skinMat,[0,1.54,0]);
+ const head=add(new THREE.SphereGeometry(1,32,24),skinMat,[0,1.77,.012]);head.scale.set(.174,.222,.157);
+ // Ears and subtle ear detail
+ for(const side of [-1,1]){add(new THREE.SphereGeometry(.043,16,12),skinMat,[side*.17,1.765,.005]);add(new THREE.SphereGeometry(.017,10,8),mat(0x986b5b,.8),[side*.18,1.765,.022]);}
+ // Hair cap, side locks and a small rear volume
+ const cap=add(new THREE.SphereGeometry(1,28,18,0,Math.PI*2,0,Math.PI*.57),hairMat,[0,1.855,-.018]);cap.scale.set(.181,.15,.164);
+ add(new THREE.SphereGeometry(.12,18,14),hairMat,[0,1.79,-.105]).scale.set(1,1.08,.75);
+ for(const side of [-1,1]){const lock=add(new THREE.CapsuleGeometry(.035,.13,5,10),hairMat,[side*.145,1.79,-.005]);lock.rotation.z=side*.12;}
+ // Eyes, irises, brows, nose and mouth all face toward the visitor (+Z)
+ for(const side of [-1,1]){
+  add(new THREE.SphereGeometry(.027,16,12),white,[side*.067,1.795,.145]).scale.set(1,.78,.55);
+  add(new THREE.SphereGeometry(.012,12,10),mat(0x49372d,.32),[side*.067,1.795,.159]);
+  const brow=add(new THREE.CapsuleGeometry(.009,.048,3,8),hairMat,[side*.067,1.837,.147]);brow.rotation.z=side*.12;
+ }
+ const nose=add(new THREE.SphereGeometry(.027,14,10),skinMat,[0,1.755,.168]);nose.scale.set(.7,.82,1.12);
+ const mouthCurve=new THREE.QuadraticBezierCurve3(new THREE.Vector3(-.034,1.704,.15),new THREE.Vector3(0,1.69,.16),new THREE.Vector3(.034,1.704,.15));
+ add(new THREE.TubeGeometry(mouthCurve,10,.004,6,false),mat(0x754c46,.85),[0,0,0]);
+ // Shirt collar, placket and discreet buttons
+ add(new THREE.ConeGeometry(.065,.12,4),white,[ -.045,1.43,.205],[0,0,Math.PI]);
+ add(new THREE.ConeGeometry(.065,.12,4),white,[ .045,1.43,.205],[0,0,Math.PI]);
+ add(new THREE.BoxGeometry(.018,.39,.012),mat(0xe6e6df,.7),[0,1.16,.218]);
+ for(let i=0;i<3;i++)add(new THREE.SphereGeometry(.009,8,6),mat(0x34434a,.5),[.018,1.31-i*.105,.231]);
+ // Shoulder caps and two-part arms, with elbows and hands
+ for(const side of [-1,1]){
+  const shoulder=add(new THREE.SphereGeometry(.115,18,14),shirtMat,[side*.255,1.405,0]);shoulder.scale.set(1,.9,1);
+  const upper=add(new THREE.CapsuleGeometry(.068,.24,6,12),shirtMat,[side*.31,1.24,.012],[0,0,side*.12]);
+  const elbow=[side*.345,1.075,.045];add(new THREE.SphereGeometry(.064,14,10),skinMat,elbow);
+  const fore=add(new THREE.CapsuleGeometry(.052,.22,6,12),skinMat,[side*.36,.96,.065],[0,0,side*.08]);
+  const hand=add(new THREE.SphereGeometry(.062,16,12),skinMat,[side*.37,.81,.085]);hand.scale.set(.8,1.15,.72);
+  // Individual fingers make the hands read as hands at close range
+  for(let f=0;f<3;f++)add(new THREE.CapsuleGeometry(.009,.045,3,6),skinMat,[side*(.345+f*.022),.765,.105]);
+  // Separate trouser legs with a slight natural stance
+  const thigh=add(new THREE.CapsuleGeometry(.088,.28,7,12),pantsMat,[side*.115,.57,0],[0,0,side*.018]);
+  const calf=add(new THREE.CapsuleGeometry(.071,.25,7,12),pantsMat,[side*.12,.29,.012],[0,0,-side*.015]);
+  add(new THREE.SphereGeometry(.105,18,12),shoeMat,[side*.12,.105,.07]).scale.set(.92,.48,1.42);
+ }
+ // Professional lanyard and readable ID badge on the chest
+ const cord=add(new THREE.TorusGeometry(.09,.008,6,24,Math.PI),accent,[0,1.385,.225],[Math.PI,0,0]);
+ const badge=add(new RoundedBoxGeometry(.12,.16,.018,4,.014),white,[.045,1.22,.239]);
+ add(new THREE.BoxGeometry(.065,.018,.003),mat(shirt,.65),[.045,1.255,.25]);
+ // Small uniform details distinguish airport staff from generic mannequins
+ if(role.includes('CHECK')){add(new THREE.SphereGeometry(.035,12,10),mat(0xe0b44f,.4),[-.19,1.35,.205]);}
+ else {add(new THREE.BoxGeometry(.19,.025,.012),mat(0xc4d4c8,.5),[0,1.48,.205]);}
+ label(role,[x,2.22,z],.48,'#ffffff','#174b61');npcs.push({group:g,phase:Math.random()*6});return g;
+}
+function suitcase(x,y,z,color=0x9b4b42){const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);const body=new THREE.Mesh(new RoundedBoxGeometry(.62,.78,.28,5,.055),mat(color,.58));body.castShadow=true;g.add(body);const rim=new THREE.Mesh(new RoundedBoxGeometry(.65,.8,.035,4,.012),mats.black);rim.position.z=.15;g.add(rim);const handle=new THREE.Mesh(new THREE.TorusGeometry(.12,.025,8,16,Math.PI),mats.metal);handle.position.y=.43;handle.rotation.z=Math.PI;g.add(handle);for(let s of [-1,1]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.05,12),mats.black);wheel.rotation.z=Math.PI/2;wheel.position.set(s*.22,-.41,.05);g.add(wheel);}g.userData.draggable=true;interactives.push(g);return g;}
+function documentCard(title,lines,x,y,z,color=0xf1eee2){const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);const p=new THREE.Mesh(new RoundedBoxGeometry(.62,.86,.025,4,.008),mat(color,.85));p.castShadow=true;g.add(p);const top=box(.54,.1,.012,mats.blue,[0,.32,.02],0);g.add(top);for(let i=0;i<lines;i++){const ln=box(.42,.012,.008,mat(0x75858a,.8),[0,.18-i*.12,.025],0);g.add(ln);}const tag=label(title,[x,y+.58,z],.36,'#fff','#17627a');g.userData.draggable=true;interactives.push(g);return g;}
+/* Terminal and check-in hall */
+floorArea(0,0,26,22);wall(0,3,-11,26,6,.35);wall(-13,3,0,.35,6,22);wall(13,3,0,.35,6,22);
+// Teto do terminal: panels, structural beams and recessed luminous ceiling bays
+box(25.7,.22,21.7,mat(0xe6e9e7,.88),[0,6.05,0],.08);for(let z=-8;z<=8;z+=4){box(25.5,.12,.16,mats.white,[0,5.82,z],.04);box(4.2,.045,1.25,mat(0xf8f5e9,.28),[0,5.88,z],.08);}
+for(let i=-10;i<=10;i+=5){const col=box(.22,5,.22,mats.metal,[i,2.5,-10.6],.03);const beam=box(.18,.18,21,mats.white,[i,5.2,0],.02);addLightStrip(i,5.0,-2,2.8);}
+for(let i=-9;i<=9;i+=3){const win=box(2.65,2.5,.07,mats.glass,[i,3.1,-10.72],.01);box(2.7,.07,.12,mats.metal,[i,3.1,-10.65],0);}
+label('SALIDAS INTERNACIONALES',[0,4.6,-9.9],1.05);label('CHECK-IN · VUELOS',[0,3.6,-4.5],.8);
+for(let i=0;i<3;i++){const x=-5+i*5;box(3.3,1.05,1.05,mats.wood,[x,.58,-4],.18);box(3.35,.09,1.1,mats.blue,[x,1.14,-4],.035);box(.55,.32,.06,mats.black,[x,1.32,-4.48],.06);const screen=box(.48,.25,.018,mat(0x132a35,.25,.12),[x,1.32,-4.44],.025);label('AEROLÍNEA',[x,1.62,-4.05],.35);}
+createNPC(-2.4,-3.4,'AGENTE DE CHECK-IN',0x176b87);
+const ticket=documentCard('TARJETA DE EMBARQUE',5,1.2,1.45,-2.8,0xf7f0dc);
+const passport=documentCard('PASAPORTE',4,-1.1,1.4,-2.4,0x244c68);
+const bag=suitcase(3.5,.48,-1.5,0x9b4b42);
+/* Conveyor, signs and seating */
+box(5,.48,1.4,mat(0x303d43,.5,.4),[7,.45,2],.22);box(4.7,.06,1.15,mat(0x202a2d,.88,.08),[7,.72,2],.08);for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,4.7,12),mats.metal);rail.rotation.z=Math.PI/2;rail.position.set(7,.88,2+side*.62);scene.add(rail);}
+for(let i=0;i<12;i++){const roller=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,1.1,12),mats.metal);roller.rotation.x=Math.PI/2;roller.position.set(4.8+i*.4,.78,2);scene.add(roller);}
+label('RECLAMO DE EQUIPAJE',[7,2.2,2],.55);
+for(let i=0;i<4;i++){const x=-9+i*1.8;box(1.3,.18,.48,mats.blue,[x,.55,5],.07);for(let s of [-1,1]){const leg=box(.08,.55,.08,mats.metal,[x+s*.48,.27,5],.02);}}
+label('INFORMACIÓN',[0,2.6,7],.6);
+/* Immigration hall - second scenario */
+floorArea(0,23,26,22);wall(0,3,12,26,6,.35);wall(-13,3,23,.35,6,22);wall(13,3,23,.35,6,22);box(25.7,.22,21.7,mat(0xe6e9e7,.88),[0,6.05,23],.08);for(let z=15;z<=31;z+=4){box(25.5,.12,.16,mats.white,[0,5.82,z],.04);box(4.2,.045,1.25,mat(0xf8f5e9,.28),[0,5.88,z],.08);}
+for(let i=-10;i<=10;i+=5){box(.22,5,.22,mats.metal,[i,2.5,12.4],.03);box(.18,.18,21,mats.white,[i,5.2,23],.02);addLightStrip(i,5,23,2.8);}
+label('CONTROL MIGRATORIO · COLOMBIA',[0,4.6,13.1],.95);
+for(let i=0;i<3;i++){const x=-5+i*5;box(3.2,1.25,.9,mats.blue,[x,.68,19],.06);box(3.3,.1,.98,mats.gold,[x,1.35,19],.02);box(1.0,1.2,.06,mats.glass,[x,2.0,19.35],.02);label('MIGRACIÓN',[x,2.9,19],.42);}
+createNPC(0,17.8,'OFICIAL DE MIGRACIÓN',0x315b49,0xb98162);
+box(16,.12,.14,mats.gold,[0,.7,23],.04);for(let i=0;i<8;i++){const x=-7+i*2;const post=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,.9,12),mats.metal);post.position.set(x,.45,22);scene.add(post);const ball=new THREE.Mesh(new THREE.SphereGeometry(.08,12,8),mats.gold);ball.position.set(x,.93,22);scene.add(ball);}label('FILA DE IMIGRAÇÃO',[0,2.3,23],.6);
+const pass2=documentCard('PASAPORTE',[4],-1,1.45,17.2,0x244c68);
+/* Ambient details, potted plants, ceiling wayfinding */
+function plant(x,z){const pot=new THREE.Mesh(new THREE.CylinderGeometry(.24,.29,.48,24),mat(0x875b48,.72));pot.position.set(x,.24,z);pot.castShadow=true;scene.add(pot);const soil=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.025,24),mat(0x382c23,1));soil.position.set(x,.49,z);scene.add(soil);for(let i=0;i<9;i++){const a=i*Math.PI*2/9;const leaf=new THREE.Mesh(new THREE.CapsuleGeometry(.075,.58,5,10),mat(i%2?0x286b4b:0x43865b,.82));leaf.position.set(x+Math.cos(a)*.18,.82+(i%3)*.08,z+Math.sin(a)*.18);leaf.rotation.z=Math.cos(a)*.52;leaf.rotation.x=Math.sin(a)*.45;leaf.castShadow=true;scene.add(leaf);}}
+plant(-10,7);plant(10,7);plant(-10,30);plant(10,30);
+const ceilingDots=new THREE.Group();for(let i=0;i<70;i++){const d=new THREE.Mesh(new THREE.SphereGeometry(.018,6,6),new THREE.MeshBasicMaterial({color:0xe3f5f6,transparent:true,opacity:.4}));d.position.set((Math.random()-.5)*24,Math.random()*4+1,(Math.random()-.5)*36);ceilingDots.add(d);}scene.add(ceilingDots);
+/* Floating mission panel in the 3D world; canvas texture is the VR interface */
+const vrUI=new THREE.Group();const panelCanvas=document.createElement('canvas');panelCanvas.width=1024;panelCanvas.height=640;const ctx=panelCanvas.getContext('2d');const panelTex=new THREE.CanvasTexture(panelCanvas);panelTex.colorSpace=THREE.SRGBColorSpace;
+const panelMesh=new THREE.Mesh(new THREE.PlaneGeometry(1.28,.82),new THREE.MeshBasicMaterial({map:panelTex,transparent:false,side:THREE.DoubleSide}));vrUI.add(panelMesh);scene.add(vrUI);
+const vrTargets=[];function vrOptions(){if(state.mission===0)return ['Viajo a Bogotá. Aquí tiene mi pasaporte.','No sé dónde está la playa.','Quiero recoger mi maleta ayer.'];if(state.mission===1)return ['Es una maleta roja, de tamaño mediano. La etiqueta dice BOG-4821.','Mi maleta es muy bonita y me gusta viajar.','¿Dónde está el restaurante más cercano?'];if(state.mission===2)return ['Vengo por turismo y voy a visitar Bogotá durante cinco días.','Mi equipaje es de color rojo.','La puerta de embarque está a la derecha.'];if(state.mission===3&&questions[state.quiz])return questions[state.quiz].a;return ['Ouvir novamente','Revisar a orientação','Continuar'];}
+function drawVRPanel(){
+  ctx.clearRect(0,0,1024,640);
+  ctx.fillStyle='#f4f7f8';ctx.fillRect(0,0,1024,640);
+  ctx.fillStyle='#102b3b';ctx.fillRect(0,0,1024,86);
+  ctx.fillStyle='#f4c77f';ctx.font='bold 25px Arial';ctx.fillText('AEROPUERTO · ESPAÑOL B1',28,34);
+  ctx.fillStyle='#fff';ctx.font='bold 31px Arial';ctx.fillText(['CHECK-IN','EQUIPAJE','MIGRACIÓN','QUIZ FINAL'][Math.min(state.mission,3)],28,70);
+  // Left column: compact listening and response menu
+  ctx.fillStyle='#17303d';ctx.font='bold 27px Arial';ctx.fillText(vrPrompt(),28,128);
+  ctx.font='20px Arial';const lines=vrDetail().split('|');
+  lines.slice(0,3).forEach((l,i)=>{ctx.fillStyle='#294653';ctx.fillText(l,30,164+i*27,620);});
+  const opts=vrOptions();
+  ctx.fillStyle='#176b87';ctx.beginPath();ctx.roundRect(28,258,610,55,12);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 23px Arial';ctx.fillText('▶  OÍR / REPETIR DIÁLOGO',50,294);
+  opts.forEach((o,i)=>{const y=340+i*68;ctx.fillStyle='#dce9ed';ctx.beginPath();ctx.roundRect(28,y-29,610,56,10);ctx.fill();ctx.fillStyle='#12384b';ctx.font='bold 19px Arial';ctx.fillText(`${String.fromCharCode( 65+i)}. ${o}`,46,y+5,570);});
+  // Right column: boarding pass as a small reference card, never full-screen
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(674,112,320,430,16);ctx.fill();
+  ctx.strokeStyle='#b8cbd1';ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(674,430);ctx.lineTo(994,430);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#176b87';ctx.font='bold 20px Arial';ctx.fillText('TARJETA DE EMBARQUE',696,150);
+  ctx.fillStyle='#102b3b';ctx.font='bold 29px Arial';ctx.fillText('BOGOTÁ',696,202);
+  ctx.font='18px Arial';ctx.fillStyle='#526873';ctx.fillText('BUENOS AIRES  →  BOGOTÁ',696,235);
+  ctx.font='bold 21px Arial';ctx.fillStyle='#17303d';ctx.fillText('AV 218',696,286);ctx.fillText('14:35',850,286);
+  ctx.font='16px Arial';ctx.fillStyle='#526873';ctx.fillText('VUELO',696,310);ctx.fillText('SALIDA',850,310);
+  ctx.font='bold 20px Arial';ctx.fillStyle='#17303d';ctx.fillText('PUERTA 12',696,365);ctx.fillText('1 MALETA',850,365);
+  ctx.font='14px Arial';ctx.fillStyle='#526873';ctx.fillText('PASAJERA: PAULA DÍAZ',696,405);
+  ctx.fillStyle='#17303d';ctx.font='bold 15px Arial';ctx.fillText('REFERENCIA · CONSULTA',696,468);ctx.font='14px Arial';ctx.fillText('La tarjeta queda a un costado',696,494);ctx.fillText('mientras escuchás y respondés.',696,516);
+  ctx.fillStyle='#176b87';ctx.beginPath();ctx.roundRect(674,560,320,55,11);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 22px Arial';ctx.fillText('CONTINUAR  →',720,596);
+  panelTex.needsUpdate=true;
+}
+function vrPrompt(){if(state.mission===0)return state.step===0?'Confira os dados da passagem.':'Fale com a atendente e confirme o check-in.';if(state.mission===1)return state.step===0?'Sua mala não apareceu na esteira.':'Registre a ocorrência com a equipe.';if(state.mission===2)return state.step===0?'Apresente o passaporte ao oficial.':'Responda às perguntas de imigração.';return 'Responda ao quiz de compreensão oral.';}
+function vrDetail(){if(state.mission===0)return 'Origem: Buenos Aires · Destino: Bogotá|Voo AV 218 · Saída 14:35 · Portão 12|Passageiro: Paula Díaz';if(state.mission===1)return 'A mala é vermelha, média e tem uma etiqueta|com o código BOG-4821. Peça ajuda em espanhol.';if(state.mission===2)return 'Perguntas: ¿Cuál es el motivo de su viaje?|¿Cuántos días va a quedarse?|Responda com frases completas.';return 'Escute cada anúncio e escolha a ação correta.';}
+const zones=[[-.224,.045,.76,.09], [-.224,-.032,.76,.075], [-.224,-.119,.76,.075], [-.224,-.206,.76,.075], [.40,-.365,.38,.085]];zones.forEach((z,i)=>{const o=new THREE.Mesh(new THREE.PlaneGeometry(z[2],z[3]),new THREE.MeshBasicMaterial({transparent:true,opacity:0}));o.position.set(z[0],z[1],.012);vrUI.add(o);o.userData.action=i===0?'listen':i===4?'next':`answer${i-1}`;vrTargets.push(o);});
+function updateVRPanel(){if(!renderer.xr.isPresenting)return;const p=camera.getWorldPosition(new THREE.Vector3());const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.getWorldQuaternion(new THREE.Quaternion()));const q=camera.getWorldQuaternion(new THREE.Quaternion());const right=new THREE.Vector3(1,0,0).applyQuaternion(q);vrUI.position.copy(p).add(dir.multiplyScalar(1.75)).addScaledVector(right,-.48).add(new THREE.Vector3(0,-.04,0));vrUI.quaternion.copy(q);drawVRPanel();}
+drawVRPanel();
+/* Audio / language helpers */
+function say(text,lang='es-AR',force=false){if((state.voice||force)&&'speechSynthesis'in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang;const voices=speechSynthesis.getVoices();const regional=voices.find(v=>/^es-AR$/i.test(v.lang))||voices.find(v=>/^es[-_]AR/i.test(v.name+' '+v.lang));if(regional)u.voice=regional;u.rate=.88;u.onerror=()=>toast('Não foi possível reproduzir o áudio neste navegador. Verifique as configurações de som.');speechSynthesis.speak(u);}else if(force){toast('Áudio não disponível neste navegador. As legendas continuam ativadas.');}toast(text);}
+function toast(t){const el=$('#toast');el.textContent=t;el.style.opacity=1;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.opacity=0,3200);}
+function announce(text){say(text,'es-AR',true);if(state.caption)toast('ÁUDIO · '+text);}
+function updateHeader(){$('#missionPill').textContent=['MISSÃO 1 · CHECK-IN','MISSÃO 2 · BAGAGEM','MISSÃO 3 · IMIGRAÇÃO','QUIZ FINAL'][Math.min(state.mission,3)];$('#progressText').textContent=state.mission<3?`Etapa ${state.mission+1} de 3`:'Avaliação final';}
+function setPanel(html){$('#panel').innerHTML=html;updateHeader();}
+function mainPanel(){if(state.mission===0)mission1();else if(state.mission===1)mission2();else if(state.mission===2)mission3();else quizPanel();}
+function mission1(){setPanel(`<span class="tag">MISSÃO 1 · BALCÃO DE ATENDIMENTO</span><h1>Faça seu check-in</h1><p>Você está no Aeroporto Internacional de Bogotá. Observe sua passagem e confirme se os dados estão corretos antes de falar com a atendente.</p><h2>1. Confira a passagem</h2><p><b>Passageira:</b> Paula Díaz<br><b>Origem:</b> Buenos Aires (EZE)<br><b>Destino:</b> Bogotá (BOG)<br><b>Voo:</b> AV 218 · <b>Saída:</b> 14h35<br><b>Portão:</b> 12 · <b>Bagagem:</b> 1 mala despachada</p><p class="small">Na cena, localize o balcão CHECK-IN e a atendente. Você pode agarrar a passagem e o passaporte.</p><h2>2. Escute e responda</h2><p><i>Agente:</i> «Buen día. ¿Adónde viajás? ¿Me mostrás tu pasaporte, por favor?»</p><button class="secondary" id="listen1">▶ Ouvir diálogo em espanhol</button><div class="choices" id="c1"><button data-v="a">Viajo a Bogotá. Aquí tiene mi pasaporte.</button><button data-v="b">No sé dónde está la playa.</button><button data-v="c">Quiero recoger mi maleta ayer.</button></div><div id="f1"></div><div class="progress"><i style="width:${state.checkin?100:35}%"></i></div><button class="gold" id="complete1" ${state.checkin?'':'disabled'}>Emitir cartão de embarque e avançar</button><p class="small">Objetivos: compreensão oral, vocabulário de viagem e interação de serviço.</p>`);$('#listen1').onclick=()=>announce('Buen día. ¿Adónde viajás? ¿Me mostrás tu pasaporte, por favor?');$('#c1').onclick=e=>{const b=e.target.closest('button');if(!b)return;const ok=b.dataset.v==='a';$('#f1').innerHTML=`<div class="feedback">${ok?'✓ Correto.':'Ainda não.'} ${ok?'A resposta informa o destino e atende ao pedido de identificação.':'A atendente perguntou o destino e solicitou o passaporte. Use «Viajo a…» e «Aquí tiene…».'}</div>`;if(ok){state.checkin=true;$('#complete1').disabled=false;$('#complete1').style.opacity=1;announce('Perfecto. Está todo en orden con tus documentos.');}};$('#complete1').onclick=()=>{state.mission=1;state.step=0;mainPanel();announce('Listo, ya tenés tu tarjeta de embarque. Seguí hasta la zona de equipaje.');rig.position.set(0,0,7);};}
+function mission2(){setPanel(`<span class="tag">MISSÃO 2 · RESOLUÇÃO DE PROBLEMAS</span><h1>Sua bagagem não apareceu</h1><p>Você chegou à esteira, mas sua mala não está entre as bagagens. A equipe de atendimento está próxima ao balcão de informações.</p><h2>1. Identifique a mala</h2><p>Cor: <b>vermelha</b> · Tamanho: <b>médio</b><br>Etiqueta: <b>BOG-4821</b> · Conteúdo: roupas e objetos pessoais.</p><button class="secondary" id="listen2">▶ Ouvir anúncio da área de bagagem</button><p><i>Agente:</i> «¿Me describís tu equipaje? ¿Tenés la etiqueta a mano?»</p><h2>2. Escolha a resposta mais clara</h2><div class="choices" id="c2"><button data-v="a">Es una maleta roja, de tamaño mediano. La etiqueta dice BOG-4821.</button><button data-v="b">Mi maleta es muy bonita y me gusta viajar.</button><button data-v="c">¿Dónde está el restaurante más cercano?</button></div><div id="f2"></div><h2>3. Registre a ocorrência</h2><p>Informe o código de identificação para localizar a bagagem.</p><button class="gold" id="report" ${state.bag?'':'disabled'}>Registrar ocorrência e avançar</button><p class="small">Pratique descrição, números, cores e pedido de assistência.</p>`);$('#listen2').onclick=()=>announce('Atención, pasajeros. Si su equipaje no aparece en la cinta, diríjase al mostrador de objetos perdidos.');$('#c2').onclick=e=>{const b=e.target.closest('button');if(!b)return;const ok=b.dataset.v==='a';$('#f2').innerHTML=`<div class="feedback">${ok?'✓ Excelente descrição.':'Tente novamente.'} ${ok?'Você descreveu cor, tamanho e código, informações úteis para rastrear a mala.':'A equipe precisa de características objetivas da mala e do código da etiqueta.'}</div>`;if(ok){state.bag=true;$('#report').disabled=false;announce('Dale, gracias. Voy a registrar tu equipaje.');}};$('#report').onclick=()=>{state.mission=2;mainPanel();rig.position.set(0,0,13);announce('Listo, ya quedó registrado. Ahora seguí hasta el control migratorio.');};}
+function mission3(){setPanel(`<span class="tag">MISSÃO 3 · CONTROLE MIGRATÓRIO</span><h1>Converse com o oficial</h1><p>Localize a fila de imigração e aproxime-se do balcão. Apresente o passaporte e responda com informações claras e coerentes.</p><button class="secondary" id="listen3">▶ Ouvir entrevista de imigração</button><h2>Oficial: «¿Cuál es el motivo de tu viaje?»</h2><div class="choices" id="c3"><button data-v="a">Vengo por turismo y voy a visitar Bogotá durante cinco días.</button><button data-v="b">Mi equipaje es de color rojo.</button><button data-v="c">La puerta de embarque está a la derecha.</button></div><div id="f3"></div><h2>Perguntas úteis</h2><p>¿Cuántos días te vas a quedar? · ¿Dónde te vas a alojar? · ¿Tenés pasaje de vuelta?</p><button class="gold" id="finish3" ${state.immigration?'':'disabled'}>Concluir entrevista e iniciar quiz</button><p class="small">O cenário representa uma simulação linguística. Não reproduz procedimentos oficiais nem substitui orientações migratórias reais.</p>`);$('#listen3').onclick=()=>announce('Buen día. ¿Cuál es el motivo de tu viaje? ¿Cuántos días pensás quedarte en Colombia?');$('#c3').onclick=e=>{const b=e.target.closest('button');if(!b)return;const ok=b.dataset.v==='a';$('#f3').innerHTML=`<div class="feedback">${ok?'✓ Resposta adequada.':'Não é a resposta adequada.'} ${ok?'Você explicou o motivo e a duração da estadia com uma frase completa.':'O oficial perguntou pelo motivo da viagem. Responda com «Vengo por…» e indique a duração.'}</div>`;if(ok){state.immigration=true;$('#finish3').disabled=false;announce('Bien. ¿Tenés pasaje de vuelta?');}};$('#finish3').onclick=()=>{state.mission=3;state.quiz=0;mainPanel();};}
+const questions=[
+{audio:'Atención, pasajeros del vuelo AV 218 con destino a Bogotá. El embarque comenzará por la puerta doce.',q:'Você ouve que o embarque do voo AV 218 começará. Para onde deve ir?',a:['À porta 12.','À esteira de bagagem.','Ao balcão de imigração.'],c:0,why:'O anúncio diz «puerta doce». Em aeroportos, puerta corresponde a portão de embarque.'},
+{audio:'Señora, su maleta no ha llegado. Por favor, diríjase al mostrador de equipajes para presentar una reclamación.',q:'A mala não chegou. Qual é a ação indicada?',a:['Ir ao balcão de bagagens e registrar uma reclamação.','Procurar diretamente o portão de embarque.','Entregar o passaporte ao piloto.'],c:0,why:'«Mostrador de equipajes» é o balcão de atendimento de bagagens; «presentar una reclamación» é registrar uma ocorrência.'},
+{audio:'Buenos días. ¿Cuánto tiempo piensa permanecer en Colombia? ¿Tiene un billete de regreso?',q:'Qual informação o oficial está solicitando?',a:['Duração da estadia e passagem de volta.','Peso e cor da mala.','Número do portão e horário do voo.'],c:0,why:'«Cuánto tiempo piensa permanecer» pergunta a duração da estadia; «billete de regreso» é a passagem de volta.'},
+{audio:'El control de seguridad está al fondo del pasillo, después de los mostradores de facturación, a la izquierda.',q:'Como chegar ao controle de segurança?',a:['Ao fundo do corredor, depois dos balcões, à esquerda.','Na entrada, antes dos balcões, à direita.','No piso inferior, atrás da esteira.'],c:0,why:'«Al fondo» significa ao fundo; «después de» indica depois; «a la izquierda» indica à esquerda.'},
+{audio:'Disculpe, ¿podría ayudarme? No encuentro la puerta de embarque. Mi vuelo sale a las catorce y treinta y cinco.',q:'Qual frase é um pedido educado de ajuda?',a:['¿Podría ayudarme?','¿Dónde está mi maleta roja?','Tengo cinco días de vacaciones.'],c:0,why:'«¿Podría ayudarme?» é uma forma cortês de pedir ajuda, adequada a uma situação de viagem.'}
+];
+function quizPanel(){const q=questions[state.quiz];if(!q){const pct=Math.round(state.score/questions.length*100);setPanel(`<span class="tag">AVALIAÇÃO CONCLUÍDA</span><h1>Missão cumprida!</h1><p>Você concluiu as três situações do aeroporto e o quiz de compreensão oral.</p><h2>Seu resultado</h2><p style="font-size:30px;font-weight:900;color:#176b87">${state.score} / ${questions.length} · ${pct}%</p><div class="feedback">${pct>=80?'Ótimo desempenho! Você identificou informações específicas e selecionou estratégias adequadas.':pct>=60?'Bom trabalho. Revise os anúncios e observe especialmente as expressões de localização e os pedidos de assistência.':'Continue praticando. Reescute os anúncios e retome o vocabulário de portões, bagagem, direções e imigração.'}</div><h2>Vocabulário-chave</h2><p>Mostrador: balcão · Equipaje: bagagem · Puerta: portão · Embarque: embarque · A la derecha: à direita · A la izquierda: à esquerda · Billete de regreso: passagem de volta.</p><button class="gold" id="restart">Reiniciar experiência</button><button class="secondary" id="credits">Créditos e fontes</button>`);$('#restart').onclick=()=>{location.reload();};$('#credits').onclick=credits;return;}
+setPanel(`<span class="tag">QUIZ · QUESTÃO ${state.quiz+1} DE ${questions.length}</span><h1>Escute e decida</h1><p>Ouça o anúncio em espanhol e escolha a ação mais adequada. Você receberá uma explicação após cada resposta.</p><button class="secondary" id="qListen">▶ Reproduzir anúncio</button><div class="feedback" style="font-style:italic">«${q.audio}»</div><h2>${q.q}</h2><div class="choices" id="qChoices">${q.a.map((a,i)=>`<button data-i="${i}">${String.fromCharCode(65+i)}. ${a}</button>`).join('')}</div><div id="qFeedback"></div><p class="small">Atenção aos interrogativos, horários, números e expressões de orientação espacial.</p>`);$('#qListen').onclick=()=>announce(q.audio);$('#qChoices').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;const ok=Number(b.dataset.i)===q.c;if(ok)state.score++;[...$('#qChoices').children].forEach((el,i)=>{el.disabled=true;if(i===q.c)el.classList.add('correct');else if(el===b)el.classList.add('wrong');});$('#qFeedback').innerHTML=`<div class="feedback"><b>${ok?'✓ Correto!':'Resposta incorreta.'}</b> ${q.why}</div><button class="gold" id="nextQ">${state.quiz===questions.length-1?'Ver resultado':'Próxima questão'}</button>`;$('#nextQ').onclick=()=>{state.quiz++;quizPanel();};};}
+function credits(){setPanel(`<span class="tag">SOBRE ESTA EXPERIÊNCIA</span><h1>Créditos e fontes</h1><p><b>Projeto didático:</b> Aeroporto Internacional da Colômbia — Espanhol B1.</p><p><b>Modelagem:</b> cenários, mobiliário, personagens, documentos, sinalização e texturas criados proceduralmente por código. Não foram utilizados modelos 3D ou imagens externas.</p><p><b>Motor 3D:</b> Three.js r160 (0.160.0), distribuído via jsDelivr. Addons oficiais: VRButton e RoomEnvironment.</p><p><b>Referências técnicas consultadas:</b><br><a href="https://threejs.org/manual/#en/webxr" target="_blank">Three.js — WebXR</a><br><a href="https://threejs.org/docs/pages/VRButton.html" target="_blank">Three.js — VRButton</a><br><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebXR_Device_API" target="_blank">MDN — WebXR Device API</a></p><p><b>Conteúdo linguístico:</b> situações e diálogos autorais para prática de espanhol B1. Os procedimentos de imigração são fictícios e devem ser verificados em fontes oficiais antes de qualquer uso informativo.</p><p class="small">Desenvolvimento demonstrativo. Compatibilidade, desempenho e ergonomia devem ser validados no Pico Neo 3 específico antes da aplicação com estudantes.</p><button class="gold" id="backCredits">Voltar à experiência</button>`);$('#backCredits').onclick=mainPanel;}
+$('#creditsStart').onclick=()=>{state.mission=0;credits();$('#startCover').style.display='none';};$('#begin').onclick=()=>{$('#startCover').style.display='none';state.seated=$('#seated').checked;camera.position.y=state.seated?1.15:1.65;state.high=$('#contrast').checked;state.caption=$('#captions').checked;state.voice=$('#voice').checked;document.body.classList.toggle('high-contrast',state.high);mainPanel();toast('Bem-vindo! Comece pelo balcão de check-in.');};
+function interactObject(obj){if(obj===ticket||obj===passport||obj===pass2){toast('Documento selecionado. Confira os dados antes de entregar ao atendente.');}else if(obj===bag){toast('Mala selecionada: vermelha, tamanho médio. Etiqueta BOG-4821.');}else{toast('Objeto selecionado.');}}
+/* Pointer and desktop/tablet movement */
+function setPointerFromEvent(e){const r=renderer.domElement.getBoundingClientRect();pointer.x=(e.clientX-r.left)/r.width*2-1;pointer.y=-(e.clientY-r.top)/r.height*2+1;}
+function getHits(){raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(interactives,true);}
+renderer.domElement.addEventListener('pointerdown',e=>{if(renderer.xr.isPresenting)return;look.active=true;look.x=e.clientX;look.y=e.clientY;setPointerFromEvent(e);const h=getHits()[0];if(h){let o=h.object;while(o.parent&&!o.userData.draggable)o=o.parent;if(o.userData.draggable){dragged=o;dragOffset.copy(o.position).sub(h.point);}}});
+renderer.domElement.addEventListener('pointermove',e=>{if(renderer.xr.isPresenting)return;if(look.active&&!dragged){const dx=e.clientX-look.x,dy=e.clientY-look.y;look.yaw-=dx*.003;look.pitch=Math.max(-1.1,Math.min(1.1,look.pitch-dy*.003));camera.rotation.order='YXZ';camera.rotation.y=look.yaw;camera.rotation.x=look.pitch;}look.x=e.clientX;look.y=e.clientY;if(dragged){setPointerFromEvent(e);raycaster.setFromCamera(pointer,camera);const plane=new THREE.Plane(new THREE.Vector3(0,1,0),-1.15);const p=new THREE.Vector3();if(raycaster.ray.intersectPlane(plane,p))dragged.position.copy(p.add(dragOffset));}});
+window.addEventListener('pointerup',()=>{if(dragged){interactObject(dragged);dragged=null;}look.active=false;});
+const touchMove={};document.querySelectorAll('#touchNav button').forEach(b=>{const k=b.dataset.move;b.addEventListener('pointerdown',e=>{e.preventDefault();touchMove[k]=true;b.setPointerCapture(e.pointerId);});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,()=>touchMove[k]=false));});const keys={};window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key==='Escape')toast('Pausa: mova-se com WASD ou use os controles do visor.');});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+function desktopMove(dt){if(renderer.xr.isPresenting)return;const v=new THREE.Vector3();if(keys.w||keys.arrowup||touchMove.forward)v.z-=1;if(keys.s||keys.arrowdown||touchMove.back)v.z+=1;if(keys.a||keys.arrowleft||touchMove.left)v.x-=1;if(keys.d||keys.arrowright||touchMove.right)v.x+=1;if(v.lengthSq()){v.normalize().applyAxisAngle(new THREE.Vector3(0,1,0),camera.rotation.y);rig.position.addScaledVector(v,dt*2.5);}rig.position.x=THREE.MathUtils.clamp(rig.position.x,-11.5,11.5);rig.position.z=THREE.MathUtils.clamp(rig.position.z,-9.5,33);}
+/* XR controller rays, trigger, grip and thumbstick locomotion */
+const controllers=[];for(let i=0;i<2;i++){const c=renderer.xr.getController(i);scene.add(c);const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,-5)]),new THREE.LineBasicMaterial({color:0x8ee5f0}));c.add(line);c.userData.line=line;const grip=renderer.xr.getControllerGrip(i);scene.add(grip);controllers.push({c,grip,select:false,squeeze:false,lastTurn:0,lastMove:0});c.addEventListener('selectstart',()=>{const origin=new THREE.Vector3();const dir=new THREE.Vector3(0,0,-1);c.getWorldPosition(origin);dir.applyQuaternion(c.getWorldQuaternion(new THREE.Quaternion()));raycaster.set(origin,dir);const hits=raycaster.intersectObjects(vrTargets.concat(interactives),true);if(hits.length){const o=hits[0].object;if(vrTargets.includes(o)){if(o.userData.action==='listen'){if(state.mission===3&&questions[state.quiz])announce(questions[state.quiz].audio);else announce(vrPrompt()+' '+vrDetail().replaceAll('|','. '));}else if(o.userData.action.startsWith('answer')){const n=Number(o.userData.action.slice(-1));if(state.mission===0)document.querySelector(`#c1 button[data-v="${['a','b','c'][n]}"]`)?.click();else if(state.mission===1)document.querySelector(`#c2 button[data-v="${['a','b','c'][n]}"]`)?.click();else if(state.mission===2)document.querySelector(`#c3 button[data-v="${['a','b','c'][n]}"]`)?.click();else document.querySelector(`#qChoices button[data-i="${n}"]`)?.click();}else{if(state.mission===0)$('#complete1')?.click();else if(state.mission===1)$('#report')?.click();else if(state.mission===2)$('#finish3')?.click();else $('#nextQ')?.click();}}else{let p=o;while(p.parent&&!p.userData.draggable)p=p.parent;if(p.userData.draggable)interactObject(p);}}});c.addEventListener('squeezestart',()=>{const origin=new THREE.Vector3();c.getWorldPosition(origin);raycaster.set(origin,new THREE.Vector3(0,0,-1).applyQuaternion(c.getWorldQuaternion(new THREE.Quaternion())));const h=raycaster.intersectObjects(interactives,true)[0];if(h){let o=h.object;while(o.parent&&!o.userData.draggable)o=o.parent;if(o.userData.draggable){c.userData.held=o;o.userData.held=true;}}});c.addEventListener('squeezeend',()=>{if(c.userData.held){interactObject(c.userData.held);c.userData.held.userData.held=false;c.userData.held=null;}});}
+const xrInputState=new WeakMap();
+function xrMove(dt){
+ if(!renderer.xr.isPresenting)return;
+ const session=renderer.xr.getSession();if(!session)return;
+ for(const src of session.inputSources){
+  if(!src.gamepad)continue;
+  const axes=Array.from(src.gamepad.axes||[]);
+  // Headsets expose thumbsticks at either axes 0/1 or 2/3. Pick the active pair.
+  const pairs=[];for(let i=0;i+1<axes.length;i+=2)pairs.push([axes[i]||0,axes[i+1]||0]);
+  let stick=[0,0],strength=0;for(const pair of pairs){const m=Math.hypot(pair[0],pair[1]);if(m>strength){strength=m;stick=pair;}}
+  const [sx,sy]=stick;const now=performance.now();let st=xrInputState.get(src);if(!st){st={lastTurn:0};xrInputState.set(src,st);}
+  if(src.handedness==='left'){
+   // Left stick: smooth forward/back and lateral movement (Y up is negative).
+   const dead=.18;let x=Math.abs(sx)>dead?sx:0,y=Math.abs(sy)>dead?sy:0;
+   const mag=Math.hypot(x,y);if(mag>.01){const speed=2.15*Math.min(1,mag);const local=new THREE.Vector3(x,0,y).normalize().multiplyScalar(speed*dt);local.applyAxisAngle(new THREE.Vector3(0,1,0),rig.rotation.y);rig.position.add(local);vignette(.08);}
+  }else if(src.handedness==='right'&&Math.abs(sx)>.68&&now-st.lastTurn>420){
+   rig.rotation.y-=Math.sign(sx)*Math.PI/6;st.lastTurn=now;vignette(.18);
+  }
+ }
+ rig.position.x=THREE.MathUtils.clamp(rig.position.x,-11.5,11.5);
+ rig.position.z=THREE.MathUtils.clamp(rig.position.z,-9.5,33);
+ for(const c of controllers){if(c.c.userData.held){const p=new THREE.Vector3();c.c.getWorldPosition(p);c.c.userData.held.position.copy(p.add(new THREE.Vector3(0,0,-.45).applyQuaternion(c.c.getWorldQuaternion(new THREE.Quaternion()))));}}
+}
+const vignetteMat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0,side:THREE.BackSide,depthWrite:false});const vignetteMesh=new THREE.Mesh(new THREE.SphereGeometry(5,16,12),vignetteMat);camera.add(vignetteMesh);let vignetteEnd=0;function vignette(duration){vignetteEnd=performance.now()+duration*1000;vignetteMat.opacity=.48;}
+/* VR panel follows the head at a comfortable distance; large virtual targets */
+renderer.xr.addEventListener('sessionstart',()=>{document.body.classList.add('vr');toast('VR: stick esquerdo para caminhar e deslocarse lateralmente; stick direito para girar; gatilho para elegir; grip para agarrar.');});
+renderer.xr.addEventListener('sessionend',()=>{document.body.classList.remove('vr');});
+/* Render and performance */
+const debugOn=new URLSearchParams(location.search).get('debug')==='1';if(debugOn)$('#debug').style.display='block';
+function animate(t,frame){const dt=Math.min(.04,(t-lastTime)/1000||.016);lastTime=t;desktopMove(dt);xrMove(dt);npcs.forEach(n=>{n.group.position.y=Math.sin(t*.0015+n.phase)*.018;});if(vignetteMat.opacity>0){vignetteMat.opacity=Math.max(0,vignetteMat.opacity-dt*2.8);}if(renderer.xr.isPresenting){updateVRPanel();}renderer.render(scene,camera);frames++;if(t-fpsTime>500){fps=frames*1000/(t-fpsTime);frames=0;fpsTime=t;if(debugOn){const info=renderer.info;$('#debug').textContent=`FPS ${fps.toFixed(0)} · Triângulos ${info.render.triangles.toLocaleString('pt-BR')} · Draw calls ${info.render.calls}`;}}}
+renderer.setAnimationLoop(animate);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+/* WebXR capability feedback */
+if(!navigator.xr){$('#xrHint').textContent='WebXR não está disponível neste navegador/contexto. A experiência será executada em modo 3D convencional.';}else{navigator.xr.isSessionSupported('immersive-vr').then(ok=>{$('#xrHint').textContent=ok?'WebXR disponível. Use o botão “ENTER VR” para iniciar a imersão.':'Este navegador não detectou suporte a VR imersiva. O modo 3D convencional continuará disponível.';}).catch(()=>{});}
+document.body.appendChild(VRButton.createButton(renderer,{optionalFeatures:['local-floor']}));
+/* seated mode and accessibility */
+$('#seated').addEventListener('change',e=>{state.seated=e.target.checked;if(!renderer.xr.isPresenting)camera.position.y=state.seated?1.15:1.65;});$('#contrast').addEventListener('change',e=>{state.high=e.target.checked;document.body.classList.toggle('high-contrast',state.high);});$('#captions').addEventListener('change',e=>state.caption=e.target.checked);$('#voice').addEventListener('change',e=>state.voice=e.target.checked);
+</script>
+</body>
+</html>
